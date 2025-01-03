@@ -1,24 +1,33 @@
 import axios from "axios";
+import dotenv from 'dotenv'
+import { getSystemPrompt } from "./prompts.js";
+
+dotenv.config();
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 const talkToLLM = async() => {
     try {
+      console.log(OPENROUTER_API_KEY)
         const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-                model: "google/gemini-2.0-flash-exp:free",
+                model: "meta-llama/llama-3-8b-instruct:free",
+                stream: true,
                 messages: [
                   {
                     role: "user",
                     content: [
                       {
                         type: "text",
-                        text: "What's in this image?"
-                      },
+                        text: "Create a simple todo application in html css for me and use local storage to store the data persistently."
+                      }
+                    ]
+                  },
+                  {
+                    role: "system",
+                    content: [
                       {
-                        type: "image_url",
-                        image_url: {
-                          url: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg"
-                        }
+                        type: "text",
+                        text: getSystemPrompt()
                       }
                     ]
                   }
@@ -36,4 +45,4 @@ const talkToLLM = async() => {
     }
 }
 
-export default talkToLLM;
+export { talkToLLM }
