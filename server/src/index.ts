@@ -1,6 +1,9 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import axios from 'axios';
+import { nodeBasePrompt } from './utils/node.js';
+import { BASE_PROMPT } from './utils/prompts.js';
+import { reactBasePrompt } from './utils/react.js';
 
 dotenv.config();
 
@@ -49,12 +52,12 @@ app.post('/template', async (req, res) => {
     const answer = response.data.choices[0].message.content;
 
     if(answer == 'node'){
-        res.json({ prompt: prompt, code: 'node' });
+        res.json({ prompt: [nodeBasePrompt]});
         return;
     }
 
     if(answer == 'react'){
-        res.json({ prompt: prompt, code: 'react' });
+        res.json({ prompt: [BASE_PROMPT, reactBasePrompt] });
         return;
     }
 
