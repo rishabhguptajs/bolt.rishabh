@@ -1,6 +1,6 @@
 import express from 'express'
 import dotenv from 'dotenv'
-import talkToLLM from './utils/talkToLLM';
+import { talkToLLM } from './utils/talkToLLM.js'
 
 dotenv.config();
 
