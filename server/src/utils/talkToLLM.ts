@@ -11,7 +11,6 @@ const talkToLLM = async() => {
       console.log(OPENROUTER_API_KEY)
         const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
                 model: "meta-llama/llama-3-8b-instruct:free",
-                stream: true,
                 messages: [
                   {
                     role: "user",
@@ -39,7 +38,7 @@ const talkToLLM = async() => {
                 }
         )
 
-        console.log(response.data)
+        console.log(response.data.choices[0].message.content)
     } catch (error: any) {
         console.log(error.message)
     }
