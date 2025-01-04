@@ -80,12 +80,8 @@ app.post('/chat', async (req, res) => {
         model: "meta-llama/llama-3-8b-instruct:free",
         messages: [
             {
-                role: "user",
-                content: messages
-            },
-            {
                 role: "system",
-                content: getSystemPrompt()
+                content: `The messages are: ${messages} and the system prompt is: ${getSystemPrompt()}`
             }
         ]
     }, {
