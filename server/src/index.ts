@@ -2,7 +2,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import axios from 'axios';
 import { nodeBasePrompt } from './utils/node.js';
-import { BASE_PROMPT } from './utils/prompts.js';
+import { BASE_PROMPT, getSystemPrompt } from './utils/prompts.js';
 import { reactBasePrompt } from './utils/react.js';
 
 dotenv.config();
@@ -52,17 +52,52 @@ app.post('/template', async (req, res) => {
     const answer = response.data.choices[0].message.content;
 
     if(answer == 'node'){
-        res.json({ prompt: [nodeBasePrompt]});
+        res.json({ 
+            prompt: [`Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\n${nodeBasePrompt}\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`],
+            uiPrompts: [nodeBasePrompt],
+            category: 'node'
+        });
         return;
     }
 
     if(answer == 'react'){
-        res.json({ prompt: [BASE_PROMPT, reactBasePrompt] });
+        res.json({ 
+            prompts: [BASE_PROMPT, `Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\n${reactBasePrompt}\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`] ,
+            uiPrompts: [reactBasePrompt],
+            category: 'react'
+        });
         return;
     }
 
     res.status(403).json({ message: "Invalid question!!" });
     return;
+})
+
+app.post('/chat', async (req, res) => {
+    const { messages } = req.body;
+
+    const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
+        model: "meta-llama/llama-3-8b-instruct:free",
+        messages: [
+            {
+                role: "user",
+                content: messages
+            },
+            {
+                role: "system",
+                content: getSystemPrompt()
+            }
+        ]
+    }, {
+        "headers": {
+            "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+            "Content-Type": "application/json"
+        }
+    })
+
+    console.log(response.data)
+
+    res.json(response.data)
 })
 
 const PORT = process.env.PORT || 8080
