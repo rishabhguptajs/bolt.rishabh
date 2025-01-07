@@ -73,17 +73,33 @@ app.post('/template', async (req, res) => {
     return;
 })
 
-app.post('/chat', async (req, res) => {
-    const { messages } = req.body;
-
+app.post("/chat", async (req, res) => {
+    const messages = req.body.messages;
     const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
         model: "meta-llama/llama-3-8b-instruct:free",
         messages: [
             {
                 role: "system",
-                content: `The messages are: ${messages} and the system prompt is: ${getSystemPrompt()}`
-            }
-        ]
+                content: [
+                    {
+                        type: "text",
+                        text: getSystemPrompt()
+                    },
+                    {
+                        type: "text", 
+                        text: "You are a creative AI assistant. When given a prompt about creating an application or feature, you should imagine and create all the necessary files and code by yourself without asking for additional requirements. Use your knowledge to make reasonable assumptions and provide a complete, working solution. Include all required code, styling, and configuration files. Make the solution production-ready with good practices and proper error handling."
+                    }
+                ]
+            },
+            ...messages.map((msg: { role: any; content: any; }) => ({
+                role: msg.role,
+                content: [{
+                    type: "text",
+                    text: msg.content
+                }]
+            }))
+        ],
+        max_tokens: 10000
     }, {
         "headers": {
             "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
@@ -93,7 +109,9 @@ app.post('/chat', async (req, res) => {
 
     console.log(response.data)
 
-    res.json(response.data)
+    res.json({
+        response: response.data
+    });
 })
 
 const PORT = process.env.PORT || 8080
