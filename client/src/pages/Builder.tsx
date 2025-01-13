@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocation, Navigate } from 'react-router-dom';
 import StepsList from '../components/StepsList';
 import FileExplorer from '../components/FileExplorer';
-import type { Step, File } from '../types';
+import type { Step, FileItem } from '../types';
 
 const Builder: React.FC = () => {
   const location = useLocation();
@@ -33,7 +33,7 @@ const Builder: React.FC = () => {
     }
   ];
 
-  const files: File[] = [
+  const files: FileItem[] = [
     {
       name: 'src',
       type: 'folder',
