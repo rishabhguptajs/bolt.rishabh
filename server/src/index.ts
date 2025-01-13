@@ -1,17 +1,21 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import axios from 'axios';
+import cors from 'cors'
 import { nodeBasePrompt } from './utils/node.js';
 import { BASE_PROMPT, getSystemPrompt } from './utils/prompts.js';
 import { reactBasePrompt } from './utils/react.js';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 dotenv.config();
 
 const app = express()
 
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 app.use(express.json())
+app.use(cors())
 
 app.get('/', (req, res) => {
     res.send("API is running!!")
@@ -75,43 +79,53 @@ app.post('/template', async (req, res) => {
 
 app.post("/chat", async (req, res) => {
     const messages = req.body.messages;
-    const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-        model: "meta-llama/llama-3-8b-instruct:free",
-        messages: [
+
+    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY as string);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const chat = model.startChat({
+        generationConfig: {
+            maxOutputTokens: 8000,
+        },
+    });
+
+    try {
+        // Add system prompts at the beginning
+        const systemPrompts = [
+            {
+                role: "system", 
+                content: getSystemPrompt()
+            },
             {
                 role: "system",
-                content: [
-                    {
-                        type: "text",
-                        text: getSystemPrompt()
-                    },
-                    {
-                        type: "text", 
-                        text: "You are a creative AI assistant. When given a prompt about creating an application or feature, you should imagine and create all the necessary files and code by yourself without asking for additional requirements. Use your knowledge to make reasonable assumptions and provide a complete, working solution. Include all required code, styling, and configuration files. Make the solution production-ready with good practices and proper error handling."
-                    }
-                ]
-            },
-            ...messages.map((msg: { role: any; content: any; }) => ({
-                role: msg.role,
-                content: [{
-                    type: "text",
-                    text: msg.content
-                }]
-            }))
-        ],
-        max_tokens: 10000
-    }, {
-        "headers": {
-            "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-            "Content-Type": "application/json"
+                content: "You are a creative AI assistant. When given a prompt about creating an application or feature, you should imagine and create all the necessary files and code by yourself without asking for additional requirements. Use your knowledge to make reasonable assumptions and provide a complete, working solution. Include all required code, styling, and configuration files. Make the solution production-ready with good practices and proper error handling. MAKE SURE THAT THERE IS NOT ANY TYPE OF ERROR IN THE CODE AND THE CODE IS WORKING PROPERLY."
+            }
+        ];
+
+        // Send system prompts first
+        for (const msg of systemPrompts) {
+            await chat.sendMessage(msg.content);
         }
-    })
 
-    console.log(response.data)
+        // Then send user messages
+        let finalResponse;
+        for (const msg of messages) {
+            finalResponse = await chat.sendMessage(msg.content);
+        }
 
-    res.json({
-        response: response.data
-    });
+        const response = await finalResponse?.response;
+        if (!response?.candidates?.[0]?.content?.parts?.[0]?.text) {
+            res.status(500).json({ error: "Invalid response from chat model" });
+            return;
+        }
+
+        res.json({
+            response: response.candidates[0].content.parts[0].text
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Error processing chat message" });
+    }
 })
 
 const PORT = process.env.PORT || 8080
