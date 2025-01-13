@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/generative-ai": "^0.21.0",
     "@types/axios": "^0.14.4",
     "@types/express": "^5.0.0",
     "@types/nodemon": "^1.19.6",
