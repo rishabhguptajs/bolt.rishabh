@@ -3,14 +3,14 @@ import { useState, useEffect } from "react"
 
 interface PreviewFrameProps {
   files: any[]
-  webcontainer: WebContainer
+  webContainer: WebContainer
 }
 
-export function PreviewFrame({ webcontainer }: PreviewFrameProps) {
+export function PreviewFrame({ files, webContainer }: PreviewFrameProps) {
   const [url, setUrl] = useState("")
 
   async function main() {
-    const installProcess = await webcontainer.spawn("npm", ["install"])
+    const installProcess = await webContainer.spawn("npm", ["install"])
 
     installProcess.output.pipeTo(
       new WritableStream({
@@ -20,9 +20,9 @@ export function PreviewFrame({ webcontainer }: PreviewFrameProps) {
       })
     )
 
-    await webcontainer.spawn("npm", ["run", "dev"])
+    await webContainer.spawn("npm", ["run", "dev"])
     // here wait for the server to start
-    webcontainer.on("server-ready", (port, url) => {
+    webContainer.on("server-ready", (port, url) => {
       console.log(url)
       console.log(port) 
       setUrl(url)
