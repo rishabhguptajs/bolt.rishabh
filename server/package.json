@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon --exec ts-node --esm src/index.ts",
+    "dev": "tsc -b && nodemon dist/index.js",
     "start": "tsc -b && node dist/index.js"
   },
   "keywords": [],
@@ -14,9 +14,11 @@
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
     "@types/axios": "^0.14.4",
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/nodemon": "^1.19.6",
     "axios": "^1.7.9",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "nodemon": "^3.1.9",
