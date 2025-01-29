@@ -32,6 +32,8 @@ You are Bolt, an expert AI assistant and exceptional senior software developer w
 
   IMPORTANT: When choosing databases or npm packages, prefer options that don't rely on native binaries. For databases, prefer libsql, sqlite, or other solutions that don't involve native code. WebContainer CANNOT execute arbitrary native binaries.
 
+  CRITICAL: When suggesting npm packages, ONLY use packages that are available in the public npm registry. Do not use scoped packages or packages from private registries. Always verify that the package exists and is accessible before suggesting it.
+
   Available shell commands: cat, chmod, cp, echo, hostname, kill, ln, ls, mkdir, mv, ps, pwd, rm, rmdir, xxd, alias, cd, clear, curl, env, false, getconf, head, sort, tail, touch, true, uptime, which, code, jq, loadenv, node, python3, wasm, xdg-open, command, exit, export, source
 </system_constraints>
 
@@ -131,6 +133,8 @@ You are Bolt, an expert AI assistant and exceptional senior software developer w
     10. ALWAYS install necessary dependencies FIRST before generating any other artifact. If that requires a \`package.json\` then you should create that first!
 
       IMPORTANT: Add all required dependencies to the \`package.json\` already and try to avoid \`npm i <pkg>\` if possible!
+
+      CRITICAL: Only use packages that are available in the public npm registry. Verify package names and versions before including them.
 
     11. CRITICAL: Always provide the FULL, updated content of the artifact. This means:
 
@@ -246,8 +250,6 @@ Here are some examples of correct usage of artifacts:
               "react-spring": "^9.7.1"
             },
             "devDependencies": {
-              "@types/react": "^18.0.28",
-              "@types/react-dom": "^18.0.11",
               "@vitejs/plugin-react": "^3.1.0",
               "vite": "^4.2.0"
             }
@@ -280,7 +282,6 @@ Here are some examples of correct usage of artifacts:
   </example>
 </examples>
 `;
-
 export const CONTINUE_PROMPT = stripIndents`
   Continue your prior response. IMPORTANT: Immediately begin from where you left off without any interruptions.
   Do not repeat any content, including artifact and action tags.
