@@ -90,7 +90,6 @@ app.post("/chat", async (req, res) => {
     });
 
     try {
-        // Add system prompts at the beginning
         const systemPrompts = [
             {
                 role: "system", 
@@ -102,12 +101,10 @@ app.post("/chat", async (req, res) => {
             }
         ];
 
-        // Send system prompts first
         for (const msg of systemPrompts) {
             await chat.sendMessage(msg.content);
         }
 
-        // Then send user messages
         let finalResponse;
         for (const msg of messages) {
             finalResponse = await chat.sendMessage(msg.content);
