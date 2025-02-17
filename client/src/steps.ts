@@ -35,7 +35,7 @@ export function parseXml(response: any): Step[] {
   if (typeof response == "string") {
     xmlMatch = response.match(/<boltArtifact[^>]*>([\s\S]*?)<\/boltArtifact>/)
   } else {
-    const res = response.choices[0].message.content
+    const res = response
     console.log("Response OBJECT:", res)
     xmlMatch = res.match(/<boltArtifact[^>]*>([\s\S]*?)<\/boltArtifact>/)
   }

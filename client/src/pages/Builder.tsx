@@ -154,12 +154,16 @@ export default function Builder() {
     })));
 
     setLoading(true);
+    const promptsToBackend = [...prompts, prompt].map((content: any) => ({
+      role: "user",
+      content
+    }));
+
+    console.log(promptsToBackend);
+
     const stepsResponse = await axios.post(`${BACKEND_URL}/chat`, {
-      messages: [...prompts, prompt].map(content => ({
-        role: "user",
-        content
-      }))
-    })
+      messages: promptsToBackend
+    });
 
     setLoading(false);
 

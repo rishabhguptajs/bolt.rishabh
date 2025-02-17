@@ -78,47 +78,32 @@ app.post('/template', async (req, res) => {
 })
 
 app.post("/chat", async (req, res) => {
-    const messages = req.body.messages;
+    const { messages } = req.body;
 
-    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY as string);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-    const chat = model.startChat({
-        generationConfig: {
-            maxOutputTokens: 8000,
-        },
-    });
-
-    try {
-        const systemPrompts = [
-            {
-                role: "system", 
-                content: getSystemPrompt()
-            },
-            {
-                role: "system",
-                content: "You are a creative AI assistant. When given a prompt about creating an application or feature, you should imagine and create all the necessary files and code by yourself without asking for additional requirements. Use your knowledge to make reasonable assumptions and provide a complete, working solution. Include all required code, styling, and configuration files. Make the solution production-ready with good practices and proper error handling. MAKE SURE THAT THERE IS NOT ANY TYPE OF ERROR IN THE CODE AND THE CODE IS WORKING PROPERLY."
+    try{
+        const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
+            model: "meta-llama/llama-3-8b-instruct:free",
+            temperature: 0,
+            messages: [
+                {
+                    role: "system", 
+                    content: getSystemPrompt()
+                },
+                {
+                    role: "user",
+                    content: messages
+                }
+            ]
+        }, {
+            "headers": {
+                "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+                "Content-Type": "application/json"
             }
-        ];
-
-        for (const msg of systemPrompts) {
-            await chat.sendMessage(msg.content);
-        }
-
-        let finalResponse;
-        for (const msg of messages) {
-            finalResponse = await chat.sendMessage(msg.content);
-        }
-
-        const response = await finalResponse?.response;
-        if (!response?.candidates?.[0]?.content?.parts?.[0]?.text) {
-            res.status(500).json({ error: "Invalid response from chat model" });
-            return;
-        }
-
-        res.json({
-            response: response.candidates[0].content.parts[0].text
         });
+
+        const answer = response.data.choices[0].message.content;
+
+        res.status(200).json({ messages: answer });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Error processing chat message" });
