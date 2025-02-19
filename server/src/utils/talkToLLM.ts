@@ -33,12 +33,10 @@ export async function talkToLLM(messages: Message[]) {
             }
         ];
 
-        // Send system prompts first
         for (const prompt of systemPrompts) {
             await chat.sendMessage(prompt.content);
         }
 
-        // Send user messages
         let finalResponse;
         for (const msg of messages) {
             finalResponse = await chat.sendMessage(msg.content);

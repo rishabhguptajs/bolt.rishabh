@@ -91,27 +91,6 @@ app.post("/chat", async (req, res) => {
   const { messages } = req.body
 
   try {
-    // const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-    //     model: "deepseek/deepseek-r1-distill-llama-70b:free",
-    //     messages: [
-    //         {
-    //             role: "system",
-    //             content: getSystemPrompt()
-    //         },
-    //         {
-    //             role: "user",
-    //             content: messages
-    //         }
-    //     ]
-    // }, {
-    //     "headers": {
-    //         "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-    //         "Content-Type": "application/json"
-    //     }
-    // });
-
-    // const answer = response.data.choices[0].message.content;
-
     const response = await talkToLLM(messages)
 
     res.status(200).json({ response })

@@ -6,7 +6,7 @@ interface PreviewFrameProps {
   webContainer: WebContainer
 }
 
-export function PreviewFrame({ files, webContainer }: PreviewFrameProps) {
+export function PreviewFrame({ webContainer }: PreviewFrameProps) {
   const [url, setUrl] = useState("")
 
   async function main() {
