@@ -21,7 +21,6 @@ export function PreviewFrame({ files, webContainer }: PreviewFrameProps) {
     )
 
     await webContainer.spawn("npm", ["run", "dev"])
-    // here wait for the server to start
     webContainer.on("server-ready", (port, url) => {
       console.log(url)
       console.log(port) 

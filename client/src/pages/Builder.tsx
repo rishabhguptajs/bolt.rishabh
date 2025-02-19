@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom"
 import { StepsList } from "../components/StepsList"
 import { FileExplorer } from "../components/FileExplorer"
@@ -40,8 +40,8 @@ export default function Builder() {
       .map((step) => {
         updateHappened = true
         if (step?.type === StepType.CreateFile) {
-          let parsedPath = step.path?.split("/") ?? [] // ["src", "components", "App.tsx"]
-          let currentFileStructure = [...originalFiles] // {}
+          let parsedPath = step.path?.split("/") ?? []
+          let currentFileStructure = [...originalFiles]
           let finalAnswerRef = currentFileStructure
 
           let currentFolder = ""
@@ -51,7 +51,6 @@ export default function Builder() {
             parsedPath = parsedPath.slice(1)
 
             if (!parsedPath.length) {
-              // final file
               let file = currentFileStructure.find(
                 (x) => x.path === currentFolder
               )
@@ -66,12 +65,10 @@ export default function Builder() {
                 file.content = step.code
               }
             } else {
-              /// in a folder
               let folder = currentFileStructure.find(
                 (x) => x.path === currentFolder
               )
               if (!folder) {
-                // create the folder
                 currentFileStructure.push({
                   name: currentFolderName,
                   type: "folder",
@@ -109,7 +106,6 @@ export default function Builder() {
 
       const processFile = (file: FileItem, isRootFolder: boolean) => {
         if (file.type === "folder") {
-          // For folders, create a directory entry
           mountStructure[file.name] = {
             directory: file.children
               ? Object.fromEntries(
@@ -128,7 +124,6 @@ export default function Builder() {
               },
             }
           } else {
-            // For files, create a file entry with contents
             return {
               file: {
                 contents: file.content || "",
@@ -140,7 +135,6 @@ export default function Builder() {
         return mountStructure[file.name]
       }
 
-      // Process each top-level file/folder
       files.forEach((file) => processFile(file, true))
 
       return mountStructure
@@ -148,7 +142,6 @@ export default function Builder() {
 
     const mountStructure = createMountStructure(files)
 
-    // Mount the structure if WebContainer is available
     console.log(mountStructure)
     webcontainer?.mount(mountStructure)
   }, [files, webcontainer])
@@ -224,7 +217,7 @@ export default function Builder() {
                 <StepsList
                   steps={steps}
                   currentStep={currentStep}
-                  onStepClick={setCurrentStep}
+                  onStepClick={(stepId: Number) => setCurrentStep(stepId as any)}
                 />
               </div>
               <div>

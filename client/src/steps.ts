@@ -29,7 +29,6 @@ import { Step, StepType } from "./types"
  * The input can have strings in the middle they need to be ignored
  */
 export function parseXml(response: any): Step[] {
-  // Extract the XML content between <boltArtifact> tags
   console.log("Response:", response)
   let xmlMatch
   if (typeof response == "string") {
@@ -48,11 +47,9 @@ export function parseXml(response: any): Step[] {
   const steps: Step[] = []
   let stepId = 1
 
-  // Extract artifact title
   const titleMatch = response.match(/title="([^"]*)"/)
   const artifactTitle = titleMatch ? titleMatch[1] : "Project Files"
 
-  // Add initial artifact step
   steps.push({
     id: stepId++,
     title: artifactTitle,
@@ -61,7 +58,6 @@ export function parseXml(response: any): Step[] {
     status: "pending",
   })
 
-  // Regular expression to find boltAction elements
   const actionRegex =
     /<boltAction\s+type="([^"]*)"(?:\s+filePath="([^"]*)")?>([\s\S]*?)<\/boltAction>/g
 
@@ -70,7 +66,6 @@ export function parseXml(response: any): Step[] {
     const [, type, filePath, content] = match
 
     if (type === "file") {
-      // File creation step
       steps.push({
         id: stepId++,
         title: `Create ${filePath || "file"}`,
@@ -81,7 +76,6 @@ export function parseXml(response: any): Step[] {
         path: filePath,
       })
     } else if (type === "shell") {
-      // Shell command step
       steps.push({
         id: stepId++,
         title: "Run command",
