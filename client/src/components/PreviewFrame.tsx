@@ -40,7 +40,7 @@ export function PreviewFrame({ files, webContainer }: PreviewFrameProps) {
           <p className="mb-2">Loading...</p>
         </div>
       )}
-      {url && <iframe width={'100%'} height={'100%'} src={url} />}
+      {url && <iframe width={'1000px'} height={'1000px'} src={url} />}
     </div>
   )
 }
